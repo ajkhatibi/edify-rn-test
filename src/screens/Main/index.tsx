@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { SafeAreaView, Text, StyleSheet, FlatList } from 'react-native';
+import { SafeAreaView, Text, StyleSheet, FlatList, View } from 'react-native';
 import { SearchBar, ListItem, Avatar } from 'react-native-elements';
 import axios from 'axios';
 import { RouteProp } from '@react-navigation/native';
@@ -18,7 +18,7 @@ interface Props {
 export default function Main(props: Props) {
     const [searchQuery, setSearchQuery] = useState("");
     const [listOfGif, setListOfGift] = useState([]);
-
+    const [searchingHasBegun, setSearchingHasBegun] = useState(false)
     const searchThroughGifyApi = async () => {
         try {
             const { data } = await axios.get("https://api.giphy.com/v1/gifs/trending", {
@@ -47,6 +47,23 @@ export default function Main(props: Props) {
             <ListItem.Chevron />
         </ListItem>
     )
+    const displayInitialContent = () => {
+        if (searchingHasBegun) {
+            return (
+                <FlatList
+                    data={listOfGif}
+                    keyExtractor={(item, index) => index.toString()}
+                    renderItem={_renderItem}
+                />
+            )
+        } else {
+            return (
+                <View style={StyleSheet.compose(styles.container, styles.contentView)}>
+                    <Text allowFontScaling>Search results empty</Text>
+                </View>
+            )
+        }
+    }
     return (
         <SafeAreaView style={styles.container}>
             <SearchBar
@@ -57,11 +74,7 @@ export default function Main(props: Props) {
                 autoCapitalize="none"
                 returnKeyType="search"
             />
-            <FlatList
-                data={listOfGif}
-                keyExtractor={(item, index) => index.toString()}
-                renderItem={_renderItem}
-            />
+            {displayInitialContent()}
         </SafeAreaView>
     )
 }
@@ -69,6 +82,10 @@ export default function Main(props: Props) {
 const styles = StyleSheet.create({
     container: {
         flex: 1
+    },
+    contentView: {
+        justifyContent: 'center',
+        alignItems: 'center'
     },
     mainFont: {
         fontSize: 20
