@@ -4,7 +4,6 @@ import { Button } from 'react-native-elements';
 import * as MediaLibrary from 'expo-media-library';
 
 export default function DetailScreen(props) {
-    console.log("details props: ", props);
     const { item } = props.route.params;
     const saveToDevice = () => {
         const ifAndroid = Platform.OS === "android" ? `file:///${item.images.preview_gif.url}` : item.images.preview_gif.url;

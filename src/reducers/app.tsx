@@ -23,10 +23,8 @@ export default (state: State = INITIAL_STATE, action: Action): State => {
         case appTypes.TRIGGER_QUERY_GIFY:
             return { ...state, searchLoading: true };
         case appTypes.TRIGGER_TRENDING_GIFY:
-            console.log("2")
             return { ...state, trendingButtongLoading: true };
         case appTypes.QUERY_TRENDING_GIFY:
-            console.log("3")
             return { ...state, data: action.payload, trendingButtongLoading: false };
         default:
             return state;

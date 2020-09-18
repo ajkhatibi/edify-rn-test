@@ -25,7 +25,6 @@ export const searchThroughGifyApi = (query: string) => async (dispatch: Dispatch
 
 export const showTrendingGify = () => async (dispatch: Dispatch) => {
     try {
-        console.log("1")
         dispatch({ type: appTypes.TRIGGER_TRENDING_GIFY });
         const { data } = await gifyAPi.get("/trending", {
             params: {
