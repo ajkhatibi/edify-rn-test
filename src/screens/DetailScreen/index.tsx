@@ -2,6 +2,7 @@ import React from 'react';
 import { SafeAreaView, Text, StyleSheet, Image, Platform, Alert } from 'react-native';
 import { Button } from 'react-native-elements';
 import * as MediaLibrary from 'expo-media-library';
+import * as FileSystem from 'expo-file-system';
 
 export default function DetailScreen(props) {
     const { item } = props.route.params;
@@ -10,15 +11,17 @@ export default function DetailScreen(props) {
         Alert.alert("Success", "Your photo has been saved!");
     }
     const saveToDevice = async () => {
-        const ifAndroid = Platform.OS === "android" ? `file:///${item.images.preview_gif.url}` : item.images.preview_gif.url;
+        const myFolder = FileSystem.documentDirectory;
         try {
+            const resp = await FileSystem.downloadAsync(item.images.preview_gif.url, `${myFolder}/img.gif`);
             const isGranted = await MediaLibrary.getPermissionsAsync();
+            console.log("resp", resp);
             if (isGranted.granted) {
-                saveGIF(ifAndroid);
+                saveGIF(resp.uri);
             } else {
                 const requestPermission = await MediaLibrary.requestPermissionsAsync();
                 if (requestPermission.granted) {
-                    saveGIF(ifAndroid);
+                    saveGIF(resp.uri);
                 }
 
             }
