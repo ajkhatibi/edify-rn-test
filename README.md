@@ -8,9 +8,8 @@ An expo application, so use expo cli to run
    yarn install
    ```
 
-````
 2. ```bash
-expo start
-````
+   expo start
+   ```
 
 3. follow instructions in terminal to run on device or sim
