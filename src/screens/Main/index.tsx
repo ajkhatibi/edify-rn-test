@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { SafeAreaView, Text, StyleSheet, FlatList, View } from 'react-native';
-import { SearchBar, ListItem, Avatar } from 'react-native-elements';
-import axios from 'axios';
+import { SearchBar, ListItem, Avatar, Button } from 'react-native-elements';
 import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { useDispatch, useSelector } from 'react-redux';
+import { STORE } from '../../reducers';
+import { searchThroughGifyApi, showTrendingGify } from '../../actions';
 
 type RootStackParamList = {
     Main: any;
@@ -17,25 +19,12 @@ interface Props {
 
 export default function Main(props: Props) {
     const [searchQuery, setSearchQuery] = useState("");
-    const [listOfGif, setListOfGift] = useState([]);
-    const [searchingHasBegun, setSearchingHasBegun] = useState(false)
-    const searchThroughGifyApi = async () => {
-        try {
-            const { data } = await axios.get("https://api.giphy.com/v1/gifs/trending", {
-                params: {
-                    api_key: "dD08mrciqbR49IJynxJX7EbTb7Jh5Ku1",
-                    limit: 25
-                }
-            })
-            setListOfGift(data.data)
-            console.log("data: ", data.data);
-        } catch (error) {
-            throw new Error(error);
-        }
-    }
+    const dispatch = useDispatch();
+    const state = useSelector((state: STORE) => state.app);
+
     useEffect(() => {
-        searchThroughGifyApi();
-    }, []);
+        dispatch(searchThroughGifyApi(searchQuery))
+    }, [searchQuery]);
 
     const _renderItem = ({ item }) => (
         <ListItem onPress={() => props.navigation.navigate("Details", { item })} bottomDivider>
@@ -47,23 +36,34 @@ export default function Main(props: Props) {
             <ListItem.Chevron />
         </ListItem>
     )
+    const showTrendingButtong = () => {
+        dispatch(showTrendingButtong())
+    }
     const displayInitialContent = () => {
-        if (searchingHasBegun) {
+        if (state.data.length > 0) {
             return (
                 <FlatList
-                    data={listOfGif}
+                    data={state.data}
                     keyExtractor={(item, index) => index.toString()}
                     renderItem={_renderItem}
                 />
             )
         } else {
             return (
-                <View style={StyleSheet.compose(styles.container, styles.contentView)}>
+                <View style={[styles.container, styles.contentView]}>
                     <Text allowFontScaling>Search results empty</Text>
+                    <Button
+                        onPress={() => dispatch(showTrendingGify())}
+                        loading={state.trendingButtongLoading}
+                        containerStyle={styles.buttonContainer}
+                        buttonStyle={styles.buttonStyle}
+                        title="Show trending gifys"
+                    />
                 </View>
             )
         }
     }
+
     return (
         <SafeAreaView style={styles.container}>
             <SearchBar
@@ -72,7 +72,9 @@ export default function Main(props: Props) {
                 value={searchQuery}
                 onChangeText={(text) => setSearchQuery(text)}
                 autoCapitalize="none"
-                returnKeyType="search"
+                autoCorrect={false}
+                autoCompleteType="off"
+                showLoading={state.searchLoading}
             />
             {displayInitialContent()}
         </SafeAreaView>
@@ -89,5 +91,12 @@ const styles = StyleSheet.create({
     },
     mainFont: {
         fontSize: 20
+    },
+    buttonContainer: {
+        margin: 10
+    },
+    buttonStyle: {
+        width: 200,
+        height: 40
     }
 })
